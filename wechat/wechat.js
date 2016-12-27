@@ -54,4 +54,12 @@ Wechat.prototype.updateAccessToken = function () {
         });
     });
 };
+Wechat.prototype.reply = function(){
+    let content = this.body;
+    let message = this.weixin;
+    let xml = util.tpl(content,message);
+    this.status = 200;
+    this.type = 'application/xml';
+    this.body = xml;
+};
 module.exports = Wechat;
