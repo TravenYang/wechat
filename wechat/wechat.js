@@ -2,6 +2,7 @@
 let prefix = 'https://api.weixin.qq.com/cgi-bin';
 let Promise = require('bluebird');
 let request = Promise.promisify(require('request'));
+let util = require('./util');
 let api = {
     accessToken: prefix + '/token?grant_type=client_credential'
 };
