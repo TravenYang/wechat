@@ -8,6 +8,7 @@ module.exports = function (opts) {
     let wechat = new Wechat(opts);
     return function *(next) {
         console.log(this.query);
+        let that = this;
         let token = opts.token;
         let signature = this.query.signature;
         let nonce = this.query.nonce;
@@ -36,6 +37,21 @@ module.exports = function (opts) {
                 console.log(content.xml);
                 let message = yield util.formatMessage(content.xml);
                 console.log('message',message);
+                if(message.MsgType === 'event'){
+                    if(message.Event === 'subscribe'){
+                        let now = new Date().getTime();
+                        that.status = 200;
+                        that.type = 'application/xml';
+                        that.body = '<xml>'+
+                        '<ToUserName><![CDATA['+message.FromUserName+']]></ToUserName>'+
+                        '<FromUserName><![CDATA['+message.ToUserName+']]></FromUserName>'+
+                        '<CreateTime>'+now+'</CreateTime>'+
+                        '<MsgType><![CDATA[text]]></MsgType>'+
+                        '<Content><![CDATA['+'hello'+']]></Content>'+
+                        '</xml>';
+                        return;
+                    }
+                }
             }
 
         }
