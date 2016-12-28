@@ -237,14 +237,6 @@ Wechat.prototype.updateMaterial = function (mediaId, news) {
 };
 Wechat.prototype.countMaterial = function () {
     let that = this;
-    let form = {
-        media_id: mediaId
-    };
-    _.extend(form, news);
-    let fetchUrl = api.temporary.fetch;
-    if (permanent) {
-        fetchUrl = api.permanent.fetch;
-    }
     return new Promise(function (resolve, reject) {
         that.fetchAccessToken()
             .then(function (data) {
