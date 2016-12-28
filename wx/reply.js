@@ -1,7 +1,16 @@
 'use strict';
-let config = require('./config');
-let Wechat = require('./wechat/wechat');
+let config = require('./../config');
+let Wechat = require('./../wechat/wechat');
 let wechatApi = new Wechat(config.wechat);
+let menu = require('./menu');
+let path = require('path');
+wechatApi.deleteMenu().then(function(){
+    console.log(222222);
+    return wechatApi.createMenu(menu);
+    console.log(222222444444);
+}).then(function(msg){
+    console.log(msg);
+});
 exports.reply = function* (next) {
     let message = this.weixin;
     if (message.MsgType === 'event') {
@@ -21,7 +30,37 @@ exports.reply = function* (next) {
             console.log('关注后扫二维码' + message.EventKey + message.Ticket);
             this.body = '看到你扫了一下哦';
         } else if (message.Event === 'VIEW') {
-            console.log('关注后扫二维码' + message.EventKey + message.Ticket);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'scancode_push') {
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanResult.ScanResult);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'scancode_waitmsg') {
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanResult.ScanResult);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'pic_sysphoto') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.count);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'pic_photo_or_album') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.count);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'pic_weixin') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.count);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'location_select') {
+            console.log(message.SendLocationInfo.Location_X);
+            console.log(message.SendLocationInfo.Location_Y);
+            console.log(message.SendLocationInfo.Scale);
+            console.log(message.SendLocationInfo.Label);
+            console.log(message.SendLocationInfo.Poiname);
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'media_id') {
+            this.body = '点击了菜单中的链接' + message.EventKey;
+        }else if (message.Event === 'view_limited') {
             this.body = '点击了菜单中的链接' + message.EventKey;
         }
     } else if (message.MsgType === 'text') {
@@ -46,13 +85,13 @@ exports.reply = function* (next) {
                 picUrl: 'http://comment.b0.upaiyun.com/system/comments/attachments/037/407/180/original/1451751663-320x320.png'
             }];
         } else if (content === '6') {
-            let data = yield wechatApi.uploadMaterial('image', __dirname + '/2.jpg');
+            let data = yield wechatApi.uploadMaterial('image', path.join(__dirname , '../2.jpg'));
             reply = {
                 type: 'image',
                 mediaId: data.media_id
             };
         } else if (content === '7') {
-            let data = yield wechatApi.uploadMaterial('video', __dirname + '/6.mp4');
+            let data = yield wechatApi.uploadMaterial('video', path.join(__dirname ,'../6.mp4'));
             reply = {
                 type: 'video',
                 title: '回复视频内容',
@@ -60,7 +99,7 @@ exports.reply = function* (next) {
                 mediaId: data.media_id
             };
         } else if (content === '8') {
-            let data = yield wechatApi.uploadMaterial('image', __dirname + '/2.jpg');
+            let data = yield wechatApi.uploadMaterial('image', path.join(__dirname ,'../2.jpg'));
             reply = {
                 type: 'music',
                 title: '回复音乐内容',
@@ -69,7 +108,7 @@ exports.reply = function* (next) {
                 thumbMediaId: data.media_id
             };
         } else if (content === '9') {
-            let data = yield wechatApi.uploadMaterial('video', __dirname + '/6.mp4', {
+            let data = yield wechatApi.uploadMaterial('video', path.join(__dirname,'../6.mp4'), {
                 type: 'video',
                 description: '{"title":"really a nice place","introduction":"never think it so easy"}'
             });
@@ -81,7 +120,7 @@ exports.reply = function* (next) {
                 mediaId: data.media_id
             };
         } else if (content === '10') {
-            let picData = yield wechatApi.uploadMaterial('image', __dirname + '/2.jpg', {});
+            let picData = yield wechatApi.uploadMaterial('image', path.join(__dirname , '../2.jpg'), {});
             let media = {
                 articles: [{
                     title: 'tututu',
@@ -132,7 +171,66 @@ exports.reply = function* (next) {
                 wechatApi.batchMaterial({offset: 0, count: 10, type: 'voice'}),
                 wechatApi.batchMaterial({offset: 0, count: 10, type: 'news'})
             ];
-            console.log('result',JSON.stringify(results));
+            console.log('result', JSON.stringify(results));
+        }else if (content === '12') {
+            // let group = yield wechatApi.createGroup('wechat7')
+            //
+            // console.log('新分组 wechat7')
+            // console.log(group)
+            //
+            // let groups = yield wechatApi.fetchGroups()
+            //
+            // console.log('加了 wechat 后的分组列表')
+            // console.log(groups)
+            ////
+            // let group2 = yield wechatApi.checkGroup(message.FromUserName)
+            //
+            // console.log('查看自己的分组')
+            //
+            // console.log(group2)
+            //
+            // let result = yield wechatApi.moveGroup(message.FromUserName, 109)
+            // console.log('移动到  115')
+            // console.log(result)
+            //
+            // let groups2 = yield wechatApi.fetchGroups()
+            //
+            // console.log('移动后的分组列表')
+            // console.log(groups2)
+            //
+            //let result2 = yield wechatApi.moveGroup([message.FromUserName], 119)
+            //console.log('批量移动到  119')
+            //console.log(result2)
+            //
+            //let groups3 = yield wechatApi.fetchGroups()
+            //
+            //console.log('批量移动后的分组列表')
+            //console.log(groups3)
+            //
+            // let result3 = yield wechatApi.updateGroup(109, 'wechat109')
+            //
+            // console.log('117 wechat2 改名 wechat117')
+            // console.log(result3)
+
+             let groups4 = yield wechatApi.fetchGroups()
+
+             console.log('改名后的分组列表')
+             console.log(groups4)
+
+             let result4 = yield wechatApi.deleteGroup(109)
+
+             console.log('删除 114 tututu 分组')
+
+             console.log(result4)
+            
+
+             let groups5 = yield wechatApi.fetchGroups()
+
+             console.log('删除 114 后分组列表')
+             console.log(groups5)
+
+
+            reply = JSON.stringify('done')
         }
         this.body = reply;
     }
