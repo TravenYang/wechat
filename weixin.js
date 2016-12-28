@@ -68,6 +68,15 @@ exports.reply = function* (next){
                 musicUrl:'http://mpge.5nd.com/2015/2015-9-12/66325/1.mp3',
                 thumbMediaId:data.media_id
             };
+        }else if(content === '9'){
+            let data = yield wechatApi.uploadMaterial('video',__dirname+'/6.mp4',{type:'video',description:'{"title":"really a nice place","introduction":"never think it so easy"}'});
+            console.log(data);
+            reply = {
+                type:'video',
+                title:'回复视频内容',
+                description:'测试视频',
+                mediaId:data.media_id
+            };
         }
         this.body = reply;
     }

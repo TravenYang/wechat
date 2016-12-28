@@ -1,12 +1,24 @@
 'use strict';
-let prefix = 'https://api.weixin.qq.com/cgi-bin';
 let Promise = require('bluebird');
 let request = Promise.promisify(require('request'));
 let util = require('./util');
 let fs = require('fs');
+let _=require('lodash');
+let prefix = 'https://api.weixin.qq.com/cgi-bin/';
+//https://api.weixin.qq.com/cgi-bin/material/add_news?access_token=ACCESS_TOKEN
+//https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type=TYPE
+//https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=ACCESS_TOKEN
 let api = {
-    accessToken: prefix + '/token?grant_type=client_credential',
-    upload:prefix+'/media/upload?'
+    accessToken: prefix + 'token?grant_type=client_credential',
+    temporary:{//临时素材
+        upload:prefix+'media/upload?'
+    },
+    permanent:{//永久素材
+        upload:prefix+'material/add_material?',
+        uploadNews:prefix+'material/add_news?',
+        uploadNewsPic:prefix+'media/uploadimg?'
+    }
+
 };
 function Wechat(opts) {
     let that = this;
@@ -68,16 +80,44 @@ Wechat.prototype.updateAccessToken = function () {
         });
     });
 };
-Wechat.prototype.uploadMaterial = function (type,filePath) {
+Wechat.prototype.uploadMaterial = function (type,material,permanent) {
     let that = this;
-    let form = {
-        media:fs.createReadStream(filePath)
-    };
+    let form = {};
+    let uploadUrl = api.temporary.upload;
+    if(permanent){
+        uploadUrl = api.permanent.upload;
+        _.extend(form,permanent);
+    }
+    console.log(type,' type');
+    if(type === 'pic'){
+        uploadUrl = api.permanent.uploadNewsPic;
+    }else if(type === 'news'){
+        uploadUrl = api.permanent.uploadNews;
+        form = material;
+    }else{
+        form.media = fs.createReadStream(material);
+    }
+    console.log(form,'form');
     return new Promise(function (resolve, reject) {
         that.fetchAccessToken()
         .then(function(data){
-            let url = api.upload + '&access_token=' + data.access_token + '&type=' + type;
-            request({method:'POST',url: url,formData:form, json: true}).then(function (response) {
+            let url = uploadUrl + 'access_token=' + data.access_token;
+            if(!permanent){
+                url+='&type='+type;
+            }else{
+                form.access_token = data.access_token;
+            }
+            let options = {
+                method:'POST',
+                url:url,
+                json:true
+            };
+            if(type==='news'){
+                options.body = form;
+            }else{
+                options.formData = form;
+            }
+            request(options).then(function (response) {
                 let _data = response[1];
                 console.log(_data);
                 if(_data){
