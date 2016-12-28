@@ -4,13 +4,6 @@ let Wechat = require('./../wechat/wechat');
 let wechatApi = new Wechat(config.wechat);
 let menu = require('./menu');
 let path = require('path');
-wechatApi.deleteMenu().then(function(){
-    console.log(222222);
-    return wechatApi.createMenu(menu);
-    console.log(222222444444);
-}).then(function(msg){
-    console.log(msg);
-});
 exports.reply = function* (next) {
     let message = this.weixin;
     if (message.MsgType === 'event') {
@@ -18,6 +11,13 @@ exports.reply = function* (next) {
             if (message.EventKey) {
                 console.log('扫二维码进来： ' + message.EventKey + ' ' + message.ticket);
             }
+            wechatApi.deleteMenu().then(function(){
+                console.log(222222);
+                return wechatApi.createMenu(menu);
+                console.log(222222444444);
+            }).then(function(msg){
+                console.log(msg);
+            });
             this.body = '很好，你订阅了这个号' + ' 消息ID ' + message.MsgId;
         } else if (message.Event === 'unsubscribe') {
             console.log('无情取关');
